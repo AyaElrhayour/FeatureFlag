@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: feature-flag-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: feature_flag_db
+      POSTGRES_USER: feature_flag_user
+      POSTGRES_PASSWORD: feature_flag_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U feature_flag_user -d feature_flag_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

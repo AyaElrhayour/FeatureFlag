@@ -3,9 +3,9 @@ spring:
     name: feature-flag-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/feature_flag_db
-    username: feature_flag_user
-    password: feature_flag_pass
+    url: jdbc:postgresql://localhost:5433/feature_flag
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

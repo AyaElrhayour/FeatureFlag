@@ -1,0 +1,40 @@
+evaluate:
+  post:
+    tags:
+      - Evaluation
+    summary: Evaluate a feature flag for a given environment and context
+    operationId: evaluateFlag
+    parameters:
+      - $ref: '../api.yaml#/components/parameters/FlagKeyParam'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/evaluation-schemas.yaml#/EvaluationRequest'
+          example:
+            environment: "prod"
+            context:
+              userId: "user-123"
+              attributes:
+                region: "us-east"
+                plan: "premium"
+    responses:
+      '200':
+        description: Evaluation result
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/evaluation-schemas.yaml#/EvaluationResponse'
+      '404':
+        description: Flag not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+      '400':
+        description: Invalid environment value
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'

@@ -1,0 +1,166 @@
+flags:
+  post:
+    tags:
+      - Feature Flags
+    summary: Create a new feature flag
+    operationId: createFlag
+    parameters:
+      - $ref: '../api.yaml#/components/parameters/ActorHeader'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/admin-schemas.yaml#/CreateFlagRequest'
+          example:
+            flagKey: "new-checkout"
+            description: "Enables the new checkout flow"
+            environments:
+              dev: true
+              staging: false
+              prod: false
+    responses:
+      '201':
+        description: Flag created successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/admin-schemas.yaml#/FlagResponse'
+      '409':
+        description: Flag with this key already exists
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+      '422':
+        description: Validation failed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+
+  get:
+    tags:
+      - Feature Flags
+    summary: List all feature flags
+    operationId: listFlags
+    responses:
+      '200':
+        description: List of all feature flags
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../schemas/admin-schemas.yaml#/FlagResponse'
+
+flagsByKey:
+  get:
+    tags:
+      - Feature Flags
+    summary: Get a feature flag by key
+    operationId: getFlag
+    parameters:
+      - $ref: '../api.yaml#/components/parameters/FlagKeyParam'
+    responses:
+      '200':
+        description: Flag found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/admin-schemas.yaml#/FlagResponse'
+      '404':
+        description: Flag not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+
+  put:
+    tags:
+      - Feature Flags
+    summary: Update a feature flag
+    operationId: updateFlag
+    parameters:
+      - $ref: '../api.yaml#/components/parameters/FlagKeyParam'
+      - $ref: '../api.yaml#/components/parameters/ActorHeader'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/admin-schemas.yaml#/UpdateFlagRequest'
+          example:
+            description: "Updated description"
+            environments:
+              dev: true
+              staging: true
+              prod: false
+            version: 1
+    responses:
+      '200':
+        description: Flag updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/admin-schemas.yaml#/FlagResponse'
+      '404':
+        description: Flag not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+      '409':
+        description: Version conflict - stale version provided
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+      '422':
+        description: Validation failed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+
+  delete:
+    tags:
+      - Feature Flags
+    summary: Delete a feature flag
+    operationId: deleteFlag
+    parameters:
+      - $ref: '../api.yaml#/components/parameters/FlagKeyParam'
+      - $ref: '../api.yaml#/components/parameters/ActorHeader'
+    responses:
+      '204':
+        description: Flag deleted successfully
+      '404':
+        description: Flag not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'
+
+flagsAudit:
+  get:
+    tags:
+      - Feature Flags
+    summary: Get audit history for a flag (most recent first)
+    operationId: getAuditHistory
+    parameters:
+      - $ref: '../api.yaml#/components/parameters/FlagKeyParam'
+    responses:
+      '200':
+        description: Audit history for the flag
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../schemas/admin-schemas.yaml#/AuditResponse'
+      '404':
+        description: Flag not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common-schemas.yaml#/ErrorResponse'

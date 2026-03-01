@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Feature Flag Platform API
+  description: API for managing and evaluating feature flags across environments
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Feature Flags
+    description: Admin API for managing feature flags
+  - name: Evaluation
+    description: Read-only API for evaluating feature flags
+
+paths:
+  /api/v1/flags:
+    $ref: './paths/admin-paths.yaml#/flags'
+
+  /api/v1/flags/{flagKey}:
+    $ref: './paths/admin-paths.yaml#/flagsByKey'
+
+  /api/v1/flags/{flagKey}/audit:
+    $ref: './paths/admin-paths.yaml#/flagsAudit'
+
+  /api/v1/flags/{flagKey}/evaluate:
+    $ref: './paths/evaluation-paths.yaml#/evaluate'
+
+components:
+  parameters:
+    FlagKeyParam:
+      name: flagKey
+      in: path
+      required: true
+      description: Unique string identifier for the feature flag
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+
+    ActorHeader:
+      name: X-Actor
+      in: header
+      required: false
+      description: Identity of the actor performing the action
+      schema:
+        type: string
+        default: "unknown"
+
+  schemas:
+    CreateFlagRequest:
+      $ref: './schemas/admin-schemas.yaml#/CreateFlagRequest'
+    UpdateFlagRequest:
+      $ref: './schemas/admin-schemas.yaml#/UpdateFlagRequest'
+    FlagResponse:
+      $ref: './schemas/admin-schemas.yaml#/FlagResponse'
+    AuditResponse:
+      $ref: './schemas/admin-schemas.yaml#/AuditResponse'
+    Environments:
+      $ref: './schemas/admin-schemas.yaml#/Environments'
+
+    EvaluationRequest:
+      $ref: './schemas/evaluation-schemas.yaml#/EvaluationRequest'
+    EvaluationResponse:
+      $ref: './schemas/evaluation-schemas.yaml#/EvaluationResponse'
+    EvaluationContext:
+      $ref: './schemas/evaluation-schemas.yaml#/EvaluationContext'
+
+    ErrorResponse:
+      $ref: './schemas/common-schemas.yaml#/ErrorResponse'

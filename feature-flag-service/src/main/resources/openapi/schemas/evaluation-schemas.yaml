@@ -1,0 +1,41 @@
+EvaluationContext:
+  type: object
+  properties:
+    userId:
+      type: string
+      description: The user ID for context-aware evaluation
+    attributes:
+      type: object
+      additionalProperties:
+        type: string
+      description: Additional key-value attributes for future rule-based evaluation
+
+EvaluationRequest:
+  type: object
+  required:
+    - environment
+  properties:
+    environment:
+      type: string
+      enum:
+        - dev
+        - staging
+        - prod
+      description: The environment to evaluate the flag in
+    context:
+      $ref: '#/EvaluationContext'
+
+EvaluationResponse:
+  type: object
+  properties:
+    flagKey:
+      type: string
+    enabled:
+      type: boolean
+    flagVersion:
+      type: integer
+    reason:
+      type: string
+      example: "Flag is enabled in prod"
+    environment:
+      type: string

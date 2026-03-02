@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: feature-flag-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: feature_flag
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d feature_flag"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: feature-flag-service
+      dockerfile: Dockerfile
+    container_name: feature-flag-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/feature_flag
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/feature_flag
+      SPRING_LIQUIBASE_USER: postgres
+      SPRING_LIQUIBASE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  k6:
+    image: grafana/k6:latest
+    container_name: feature-flag-k6
+    depends_on:
+      app:
+        condition: service_healthy
+    volumes:
+      - ./k6:/scripts
+    environment:
+      - BASE_URL=http://app:8080
+    command: run /scripts/evaluation-load-test.js
+    profiles:
+      - perf
+
+volumes:
+  postgres_data:

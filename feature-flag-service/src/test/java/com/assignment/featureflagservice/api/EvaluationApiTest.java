@@ -22,6 +22,7 @@ class EvaluationApiTest extends BaseIntegrationTest {
     void setUp() {
         cleaner.cleanAll();
 
+        // Create a flag with known per-environment state for all evaluation tests
         given().contentType(ContentType.JSON)
                 .body("""
                 {
@@ -37,6 +38,9 @@ class EvaluationApiTest extends BaseIntegrationTest {
                 .post("/api/v1/flags");
     }
 
+    // ══════════════════════════════════════
+    // EVALUATION — Per Environment
+    // ══════════════════════════════════════
     @Nested
     class EnvironmentEvaluationTests {
 
@@ -69,6 +73,9 @@ class EvaluationApiTest extends BaseIntegrationTest {
         }
     }
 
+    // ══════════════════════════════════════
+    // EVALUATION — Response fields
+    // ══════════════════════════════════════
     @Nested
     class EvaluationResponseTests {
 
@@ -104,6 +111,7 @@ class EvaluationApiTest extends BaseIntegrationTest {
 
         @Test
         void givenContextWithAttributes_whenEvaluate_thenContextIsAcceptedAndIgnored() {
+            // Context is accepted but doesn't affect decision yet
             given()
                     .contentType(ContentType.JSON)
                     .body("""
@@ -126,6 +134,9 @@ class EvaluationApiTest extends BaseIntegrationTest {
         }
     }
 
+    // ══════════════════════════════════════
+    // EVALUATION — Error cases
+    // ══════════════════════════════════════
     @Nested
     class EvaluationErrorTests {
 

@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationFailed(
+    public ResponseEntity<ErrorResponse>                                                                                                                                                                                                                                                                                                                                                             handleValidationFailed(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
         String message = ex.getBindingResult()

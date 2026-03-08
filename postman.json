@@ -1,0 +1,689 @@
+{
+  "info": {
+    "name": "Feature Flag Platform",
+    "description": "Complete API collection for the Feature Flag Platform — covers all endpoints, valid scenarios, error cases, and the full flag lifecycle.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "flagKey",
+      "value": "new-checkout",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Feature Flags — CRUD",
+      "item": [
+        {
+          "name": "Create Flag — valid",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"{{flagKey}}\",\n  \"description\": \"Enable new checkout flow\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — all environments enabled",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"dark-mode\",\n  \"description\": \"Dark mode feature\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": true,\n    \"prod\": true\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — all environments disabled",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"payment-v2\",\n  \"description\": \"New payment flow — disabled everywhere\",\n  \"environments\": {\n    \"dev\": false,\n    \"staging\": false,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — no X-Actor header (defaults to unknown)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"beta-banner\",\n  \"description\": \"Beta banner flag\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — duplicate key (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"{{flagKey}}\",\n  \"description\": \"This will fail — key already exists\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — missing flagKey (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Missing flagKey field\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — missing description (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"missing-desc\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — missing environments (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"missing-envs\",\n  \"description\": \"No environments field\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flag — empty body (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Flag — existing",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Flag — not found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/ghost-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "ghost-flag"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List All Flags — populated",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Flag — valid version",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Enable new checkout — now in staging too\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": true,\n    \"prod\": false\n  },\n  \"version\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Flag — enable all environments",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Full rollout — enabled everywhere\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": true,\n    \"prod\": true\n  },\n  \"version\": 2\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Flag — stale version (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"This will fail — stale version\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  },\n  \"version\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Flag — missing version (422)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Missing version field\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Flag — missing environments (422)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Missing environments\",\n  \"version\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Flag — not found (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/ghost-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "ghost-flag"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Flag does not exist\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  },\n  \"version\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Flag — existing",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/dark-mode", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "dark-mode"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Flag — not found (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/ghost-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "ghost-flag"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Flag — verify deleted (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/dark-mode", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "dark-mode"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audit History",
+      "item": [
+        {
+          "name": "Get Audit History — existing flag",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/audit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "audit"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit History — after create only (1 record)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/payment-v2/audit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "payment-v2", "audit"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit History — after create and updates (multiple records, most recent first)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/audit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "audit"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit History — after deletion (audit preserved)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/dark-mode/audit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "dark-mode", "audit"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit History — flag never existed (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/ghost-flag/audit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "ghost-flag", "audit"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Evaluation",
+      "item": [
+        {
+          "name": "Evaluate — dev (enabled)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"dev\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — staging (disabled)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"staging\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — prod (disabled)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"prod\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — with userId context",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user-123\"\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — with full context and attributes",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user-456\",\n    \"attributes\": {\n      \"region\": \"us-east\",\n      \"plan\": \"premium\",\n      \"beta\": \"true\"\n    }\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — with empty context object",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"staging\",\n  \"context\": {}\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — flag not found (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/ghost-flag/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "ghost-flag", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"prod\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — invalid environment value (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"production\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — uppercase environment (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"DEV\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — missing environment (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate — null environment (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/{{flagKey}}/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "{{flagKey}}", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": null\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Full Lifecycle Flow",
+      "description": "Run these requests in order to walk through the complete flag lifecycle — create, read, update, evaluate, delete, and verify audit is preserved.",
+      "item": [
+        {
+          "name": "Step 1 — Create flag with prod disabled",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"lifecycle-flag\",\n  \"description\": \"Lifecycle test flag\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": true,\n    \"prod\": false\n  }\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 2 — Get flag (version is 1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 3 — Evaluate in prod (disabled)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"prod\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 4 — Enable prod via update (send version 1)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Lifecycle test flag — prod enabled\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": true,\n    \"prod\": true\n  },\n  \"version\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 5 — Evaluate in prod (now enabled, flagVersion is 2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"prod\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 6 — Try stale version update (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"This will fail — sending stale version 1\",\n  \"environments\": {\n    \"dev\": true,\n    \"staging\": false,\n    \"prod\": false\n  },\n  \"version\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 7 — Check audit history (CREATED + UPDATED, most recent first)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag/audit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag", "audit"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 8 — Delete the flag",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Actor", "value": "aya" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 9 — Get deleted flag (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 10 — Evaluate deleted flag (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag", "evaluate"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"environment\": \"prod\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 11 — Audit still exists after deletion (CREATED + UPDATED + DELETED)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/flags/lifecycle-flag/audit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "flags", "lifecycle-flag", "audit"] }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
